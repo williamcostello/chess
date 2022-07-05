@@ -1,0 +1,22 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "Playable chess game",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamcostello/chess.git"
+  },
+  "author": "William Costello",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/williamcostello/chess/issues"
+  },
+  "homepage": "https://github.com/williamcostello/chess#readme"
+}
