@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Playable chess game",
   "main": "index.js",
+  "type": "module",
   "directories": {
     "test": "test"
   },
@@ -18,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/williamcostello/chess/issues"
   },
-  "homepage": "https://github.com/williamcostello/chess#readme"
+  "homepage": "https://github.com/williamcostello/chess#readme",
+  "devDependencies": {
+    "mocha": "^10.0.0"
+  }
 }
