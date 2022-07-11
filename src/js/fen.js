@@ -1,5 +1,5 @@
 import { Piece } from './piece.js'
-
+import Turn from './turn.js'
 /**
  * Maps FEN characters to their pieces
  */
@@ -40,6 +40,24 @@ class Fen {
       }
     }
     return positionArray
+  }
+
+  static parseTurn(turn) {
+    return turn == 'w' ? Turn.WHITE : Turn.BLACK
+  }
+
+  static parseCastles(castles) {
+    const blackKingSide = castles.includes('k')
+    const blackQueenSide = castles.includes('q')
+    const whiteKingSide = castles.includes('K')
+    const whiteQueenSide = castles.includes('Q')
+
+    return {
+      blackKingSide,
+      blackQueenSide,
+      whiteKingSide,
+      whiteQueenSide,
+    }
   }
 }
 
