@@ -5,25 +5,19 @@ const DEFAULT_POSITION_FEN =
 
 class Board {
   constructor(fen = DEFAULT_POSITION_FEN) {
-    this.position = new Array(64)
+    this.loadFen(fen)
   }
 
   loadFen(fen) {
-    const segments = fen.split(' ')
+    const { position, turn, castles, enPassant, halfMoveClock, fullMoveCount } =
+      Fen.parseFen(fen)
 
-    if (segments.length !== 6)
-      throw new Error(
-        `Invalid FEN String: there should be 6 segments (${segments.length})`
-      )
-
-    const [position, turn, castles, enPassant, halfMove, fullMove] = segments
-
-    // this.position = Fen.parsePosition(position)
-    // this.turn = Fen.parseTurn(turn)
-    // this.castles = this.parseCastles(castles)
-    // this.enPassant = this.parseEnPassant(enPassant)
-    // this.halfMoveCounter = this.parseHalfMoveCounter(halfMove)
-    // this.fullMoveCounter = this.parseFullMoveCounter(fullMove)
+    this.position = position
+    this.turn = turn
+    this.castles = castles
+    this.enPassant = enPassant
+    this.halfMoveClock = halfMoveClock
+    this.fullMoveCount = fullMoveCount
   }
 }
 

@@ -81,15 +81,7 @@ describe('Fen', () => {
         'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
       )
 
-      // Verify
-      const equalsDefaultPosition = result.every(
-        (element, i) => element == DEFAULT_POSITION_ARRAY[i]
-      )
-
-      assert(
-        equalsDefaultPosition,
-        'The position does not match the starting position'
-      )
+      assert.deepStrictEqual(result, DEFAULT_POSITION_ARRAY, 'Bosh')
     })
   })
 
@@ -102,7 +94,7 @@ describe('Fen', () => {
       const result = Fen.parseTurn('w')
 
       // Verify
-      assert.strictEqual(expected, result, 'Turn is not white')
+      assert.strictEqual(result, expected, 'Turn is not white')
     })
 
     it('parses a black turn correctly', () => {
@@ -113,7 +105,7 @@ describe('Fen', () => {
       const result = Fen.parseTurn('b')
 
       // Verify
-      assert.strictEqual(expected, result, 'Turn is not white')
+      assert.strictEqual(result, expected, 'Turn is not white')
     })
   })
 
@@ -131,11 +123,105 @@ describe('Fen', () => {
       const result = Fen.parseCastles('KQkq')
 
       // Verify
-      assert.deepEqual(
-        expected,
+      assert.deepEqual(result, expected, 'Castles not parsed correctly')
+    })
+  })
+
+  describe('parseCoordinate', () => {
+    it('returns null if there is no enpassant available', () => {
+      // Setup
+      const expected = null
+
+      // Exercise
+      const result = Fen.parseCoordinate('-')
+
+      // Verify
+      assert.strictEqual(result, expected, 'Did not return null')
+    })
+
+    it('returns the index of c3 on the board', () => {
+      // Setup
+      const expected = 18
+
+      // Exercise
+      const result = Fen.parseCoordinate('c3')
+
+      // Verify
+      assert.strictEqual(
         result,
-        `Castles not parsed correctly ${JSON.stringify(result)}`
+        expected,
+        'Did not return expected board index'
       )
+    })
+
+    it('returns the index of h6 on the board', () => {
+      // Setup
+      const expected = 47
+
+      // Exercise
+      const result = Fen.parseCoordinate('h6')
+
+      // Verify
+      assert.strictEqual(
+        result,
+        expected,
+        'Did not return expected board index'
+      )
+    })
+
+    it('returns the index of a1 on the board', () => {
+      // Setup
+      const expected = 0
+
+      // Exercise
+      const result = Fen.parseCoordinate('a1')
+
+      // Verify
+      assert.strictEqual(
+        result,
+        expected,
+        'Did not return expected board index'
+      )
+    })
+
+    it('returns the index of h8 on the board', () => {
+      // Setup
+      const expected = 63
+
+      // Exercise
+      const result = Fen.parseCoordinate('h8')
+
+      // Verify
+      assert.strictEqual(
+        result,
+        expected,
+        'Did not return expected board index'
+      )
+    })
+  })
+
+  describe('parseFen', () => {
+    it('parses the default FEN correctly', () => {
+      // Setup
+      const expected = {
+        position: DEFAULT_POSITION_ARRAY,
+        turn: Turn.WHITE,
+        castles: {
+          blackKingSide: true,
+          blackQueenSide: true,
+          whiteKingSide: true,
+          whiteQueenSide: true,
+        },
+        enPassant: null,
+        halfMoveClock: 0,
+        fullMoveCount: 1,
+      }
+
+      // Exercise
+      const result = Fen.parseFen(DEFAULT_POSITION_FEN)
+
+      // Verify
+      assert.deepStrictEqual(result, expected, 'Did not return expected object')
     })
   })
 })

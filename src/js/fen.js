@@ -1,5 +1,6 @@
 import { Piece } from './piece.js'
 import Turn from './turn.js'
+
 /**
  * Maps FEN characters to their pieces
  */
@@ -16,6 +17,20 @@ const FEN_MAP = {
   r: Piece.ROOK | Piece.BLACK,
   q: Piece.QUEEN | Piece.BLACK,
   k: Piece.KING | Piece.BLACK,
+}
+
+/**
+ * Maps file letters to their numeric representation
+ */
+const FILE_MAP = {
+  a: 0,
+  b: 1,
+  c: 2,
+  d: 3,
+  e: 4,
+  f: 5,
+  g: 6,
+  h: 7,
 }
 
 class Fen {
@@ -59,7 +74,28 @@ class Fen {
       whiteQueenSide,
     }
   }
-}
 
+  static parseCoordinate(coordinate) {
+    const isCoordinate = /[a-h][1-8]/
+    if (!isCoordinate.test(coordinate)) return null
+
+    const [file, rank] = coordinate.split('')
+    return FILE_MAP[file] + 8 * (rank - 1)
+  }
+
+  static parseFen(fen) {
+    const [position, turn, castles, enPassant, halfMoveClock, fullMoveCount] =
+      fen.split(' ')
+
+    return {
+      position: Fen.parsePosition(position),
+      turn: Fen.parseTurn(turn),
+      castles: Fen.parseCastles(castles),
+      enPassant: Fen.parseCoordinate(enPassant),
+      halfMoveClock: parseInt(halfMoveClock),
+      fullMoveCount: parseInt(fullMoveCount),
+    }
+  }
+}
 export default Fen
 export { FEN_MAP }
