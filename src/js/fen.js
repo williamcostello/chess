@@ -96,6 +96,11 @@ class Fen {
       fullMoveCount: parseInt(fullMoveCount),
     }
   }
+
+  static getFenCharacterFromPiece(piece) {
+    return Object.keys(FEN_MAP).find((key) => FEN_MAP[key] === piece)
+  }
 }
+
 export default Fen
 export { FEN_MAP }
