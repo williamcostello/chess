@@ -33,6 +33,11 @@ export const FILE_MAP = {
   h: 7,
 }
 
+/**
+ * Takes a FEN position and returns a positionArray
+ * @param {string} position
+ * @return {number[]} positionArray
+ */
 export const parsePosition = (position) => {
   // Clean input
   position = position.replace(/[\s\/]/g, '').trim()
@@ -56,10 +61,20 @@ export const parsePosition = (position) => {
   return positionArray
 }
 
+/**
+ * Takes a FEN turn and returns the turn as a boolean (white = 0)
+ * @param {string} turn
+ * @returns {boolean} turnBool
+ */
 export const parseTurn = (turn) => {
   return turn == 'w' ? Turn.WHITE : Turn.BLACK
 }
 
+/**
+ * Takes a FEN castle string and returns an available castles object
+ * @param {string} castles
+ * @returns {Object} availableCastles
+ */
 export const parseCastles = (castles) => {
   const blackKingSide = castles.includes('k')
   const blackQueenSide = castles.includes('q')
@@ -74,6 +89,11 @@ export const parseCastles = (castles) => {
   }
 }
 
+/**
+ * Takes a coordinate string and returns its index on the board
+ * @param {string} coordinate
+ * @returns {number} boardIndex
+ */
 export const parseCoordinate = (coordinate) => {
   const isCoordinate = /[a-h][1-8]/
   if (!isCoordinate.test(coordinate)) return null
@@ -82,6 +102,11 @@ export const parseCoordinate = (coordinate) => {
   return FILE_MAP[file] + 8 * (rank - 1)
 }
 
+/**
+ * Takes an entire FEN string and parses it
+ * @param {string} fen
+ * @returns {Object} game state
+ */
 export const parseFen = (fen) => {
   const [position, turn, castles, enPassant, halfMoveClock, fullMoveCount] =
     fen.split(' ')
@@ -96,6 +121,11 @@ export const parseFen = (fen) => {
   }
 }
 
+/**
+ * Takes a piece and returns its FEN position character
+ * @param {number} piece
+ * @returns {char}
+ */
 export const getFenCharacterFromPiece = (piece) => {
   return Object.keys(FEN_MAP).find((key) => FEN_MAP[key] === piece)
 }
