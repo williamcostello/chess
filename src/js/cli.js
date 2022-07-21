@@ -6,15 +6,16 @@ class CLI {
     let start = 63 - 7
     let end = 64
 
+    let out = ''
     while (start >= 0) {
-      let line = ''
       for (let i = start; i < end; i++) {
-        line += Fen.getFenCharacterFromPiece(position[i]) ?? '-'
+        out += Fen.getFenCharacterFromPiece(position[i]) ?? '-'
       }
-      console.log(line)
+      out += '\n'
       start -= 8
       end -= 8
     }
+    console.log(out)
   }
 }
 

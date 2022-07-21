@@ -1,4 +1,4 @@
-import Fen from './fen.js'
+import { parseFen } from './fen.js'
 
 const DEFAULT_POSITION_FEN =
   'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
