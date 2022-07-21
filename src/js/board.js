@@ -10,7 +10,7 @@ class Board {
 
   loadFen(fen) {
     const { position, turn, castles, enPassant, halfMoveClock, fullMoveCount } =
-      Fen.parseFen(fen)
+      parseFen(fen)
 
     this.position = position
     this.turn = turn

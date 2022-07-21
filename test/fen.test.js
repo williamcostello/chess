@@ -1,5 +1,5 @@
 import assert from 'assert'
-import Fen from '../src/js/fen.js'
+import * as Fen from '../src/js/fen.js'
 import { Piece } from '../src/js/piece.js'
 import Turn from '../src/js/turn.js'
 

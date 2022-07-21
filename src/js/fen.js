@@ -4,7 +4,7 @@ import Turn from './turn.js'
 /**
  * Maps FEN characters to their pieces
  */
-const FEN_MAP = {
+export const FEN_MAP = {
   P: Piece.PAWN | Piece.WHITE,
   N: Piece.KNIGHT | Piece.WHITE,
   B: Piece.BISHOP | Piece.WHITE,
@@ -22,7 +22,7 @@ const FEN_MAP = {
 /**
  * Maps file letters to their numeric representation
  */
-const FILE_MAP = {
+export const FILE_MAP = {
   a: 0,
   b: 1,
   c: 2,
@@ -33,74 +33,69 @@ const FILE_MAP = {
   h: 7,
 }
 
-class Fen {
-  static parsePosition(position) {
-    // Clean input
-    position = position.replace(/[\s\/]/g, '').trim()
+export const parsePosition = (position) => {
+  // Clean input
+  position = position.replace(/[\s\/]/g, '').trim()
 
-    let positionArray = new Array(64)
-    let positionIndex = 0
-    for (const char of position) {
-      if (char in FEN_MAP) {
-        positionArray[positionIndex] = FEN_MAP[char]
+  let positionArray = new Array(64)
+  let positionIndex = 0
+  for (const char of position) {
+    if (char in FEN_MAP) {
+      positionArray[positionIndex] = FEN_MAP[char]
+      positionIndex++
+    } else if (/\d/.test(char)) {
+      const numberOfBlanks = Number(char)
+      const targetIndex = positionIndex + numberOfBlanks
+
+      while (positionIndex < targetIndex) {
+        positionArray[positionIndex] = Piece.NONE
         positionIndex++
-      } else if (/\d/.test(char)) {
-        const numberOfBlanks = Number(char)
-        const targetIndex = positionIndex + numberOfBlanks
-
-        while (positionIndex < targetIndex) {
-          positionArray[positionIndex] = Piece.NONE
-          positionIndex++
-        }
       }
     }
-    return positionArray
   }
+  return positionArray
+}
 
-  static parseTurn(turn) {
-    return turn == 'w' ? Turn.WHITE : Turn.BLACK
-  }
+export const parseTurn = (turn) => {
+  return turn == 'w' ? Turn.WHITE : Turn.BLACK
+}
 
-  static parseCastles(castles) {
-    const blackKingSide = castles.includes('k')
-    const blackQueenSide = castles.includes('q')
-    const whiteKingSide = castles.includes('K')
-    const whiteQueenSide = castles.includes('Q')
+export const parseCastles = (castles) => {
+  const blackKingSide = castles.includes('k')
+  const blackQueenSide = castles.includes('q')
+  const whiteKingSide = castles.includes('K')
+  const whiteQueenSide = castles.includes('Q')
 
-    return {
-      blackKingSide,
-      blackQueenSide,
-      whiteKingSide,
-      whiteQueenSide,
-    }
-  }
-
-  static parseCoordinate(coordinate) {
-    const isCoordinate = /[a-h][1-8]/
-    if (!isCoordinate.test(coordinate)) return null
-
-    const [file, rank] = coordinate.split('')
-    return FILE_MAP[file] + 8 * (rank - 1)
-  }
-
-  static parseFen(fen) {
-    const [position, turn, castles, enPassant, halfMoveClock, fullMoveCount] =
-      fen.split(' ')
-
-    return {
-      position: Fen.parsePosition(position),
-      turn: Fen.parseTurn(turn),
-      castles: Fen.parseCastles(castles),
-      enPassant: Fen.parseCoordinate(enPassant),
-      halfMoveClock: parseInt(halfMoveClock),
-      fullMoveCount: parseInt(fullMoveCount),
-    }
-  }
-
-  static getFenCharacterFromPiece(piece) {
-    return Object.keys(FEN_MAP).find((key) => FEN_MAP[key] === piece)
+  return {
+    blackKingSide,
+    blackQueenSide,
+    whiteKingSide,
+    whiteQueenSide,
   }
 }
 
-export default Fen
-export { FEN_MAP }
+export const parseCoordinate = (coordinate) => {
+  const isCoordinate = /[a-h][1-8]/
+  if (!isCoordinate.test(coordinate)) return null
+
+  const [file, rank] = coordinate.split('')
+  return FILE_MAP[file] + 8 * (rank - 1)
+}
+
+export const parseFen = (fen) => {
+  const [position, turn, castles, enPassant, halfMoveClock, fullMoveCount] =
+    fen.split(' ')
+
+  return {
+    position: parsePosition(position),
+    turn: parseTurn(turn),
+    castles: parseCastles(castles),
+    enPassant: parseCoordinate(enPassant),
+    halfMoveClock: parseInt(halfMoveClock),
+    fullMoveCount: parseInt(fullMoveCount),
+  }
+}
+
+export const getFenCharacterFromPiece = (piece) => {
+  return Object.keys(FEN_MAP).find((key) => FEN_MAP[key] === piece)
+}
