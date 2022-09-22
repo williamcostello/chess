@@ -39,11 +39,9 @@ export const FILE_MAP = {
  * @return {number[]} positionArray
  */
 export const parsePosition = (position) => {
-  // Clean input
-  position = position.replace(/[\s\/]/g, '').trim()
-
   let positionArray = new Array(64)
   let positionIndex = 0
+
   for (const char of position) {
     if (char in FEN_MAP) {
       positionArray[positionIndex] = FEN_MAP[char]
@@ -58,6 +56,7 @@ export const parsePosition = (position) => {
       }
     }
   }
+
   return positionArray
 }
 
