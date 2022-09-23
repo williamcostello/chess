@@ -37,4 +37,4 @@ const getPieceType = (piece) => piece & PIECE_TYPE_MASK
  */
 const getPieceColour = (piece) => piece & PIECE_COLOUR_MASK
 
-export { Piece }
+export { Piece, getPieceColour, getPieceType }
