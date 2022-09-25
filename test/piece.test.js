@@ -1,5 +1,10 @@
 import assert from 'assert'
-import { Piece, getPieceType, getPieceColour } from '../src/js/piece.js'
+import {
+  Piece,
+  getPieceType,
+  getPieceColour,
+  getPieceName,
+} from '../src/js/piece.js'
 
 describe('Piece', () => {
   describe('getPieceType', () => {
@@ -47,6 +52,30 @@ describe('Piece', () => {
 
       // Verify
       assert.strictEqual(colour, Piece.WHITE, 'Piece colour is not WHITE')
+    })
+  })
+
+  describe('getPieceName', () => {
+    it('gets correct name from BLACK PAWN', () => {
+      // Setup
+      const piece = Piece.PAWN | Piece.BLACK
+
+      // Execution
+      const name = getPieceName(piece)
+
+      // Verify
+      assert.strictEqual(name, 'PAWN', 'Piece name is not PAWN')
+    })
+
+    it('gets correct name from WHITE QUEEN', () => {
+      // Setup
+      const piece = Piece.QUEEN | Piece.WHITE
+
+      // Execution
+      const name = getPieceName(piece)
+
+      // Verify
+      assert.strictEqual(name, 'QUEEN', 'Piece name is not QUEEN')
     })
   })
 })

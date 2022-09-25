@@ -1,4 +1,9 @@
-import { getPieceType, getPieceColour } from './piece.js'
+import {
+  Piece,
+  getPieceType,
+  getPieceColour,
+  getPieceTypeName,
+} from './piece.js'
 
 const renderBoard = (position) => {
   let board = document.createElement('div')
@@ -18,7 +23,9 @@ const renderBoard = (position) => {
       square.classList.add('board__square', squareColour)
       square.dataset.squareIndex = squareIndex
 
-      renderPiece(square, position[squareIndex])
+      if (position[squareIndex] != Piece.NONE) {
+        renderPiece(square, position[squareIndex])
+      }
 
       row.appendChild(square)
     }
@@ -30,12 +37,11 @@ const renderBoard = (position) => {
 }
 
 const renderPiece = (square, piece) => {
-  if (piece == Piece.NONE) return
-
   const svgUrl = getSvgUrlForPiece(piece)
 
   const pieceDiv = document.createElement('div')
   pieceDiv.style.backgroundImage = `url('${svgUrl}')`
+  pieceDiv.className = 'board__piece'
 
   square.appendChild(pieceDiv)
 }
@@ -47,23 +53,91 @@ const getSquareColourFromRankAndFile = (rank, file) => {
 const getSquareIndexFromRankAndFile = (rank, file) => rank * 8 + file
 
 const getSvgUrlForPiece = (piece) => {
-  // get piece name
-  // get piece colour
+  const name = getPieceTypeName(getPieceType(piece))
+  const colour = getPieceColour(piece) === Piece.BLACK ? 'BLACK' : 'WHITE'
+  return `../svg/${name}_${colour}.svg`
 }
 
-const renderDebugIndices = () => {
-  const squares = document.querySelectorAll('.board__square')
+// const renderDebugIndices = () => {
+//   const squares = document.querySelectorAll('.board__square')
 
-  squares.forEach((square, position) => {
-    const debugIndexDiv = document.createElement('div')
-    debugIndexDiv.classList.add('board__debug-position')
+//   squares.forEach((square, position) => {
+//     const debugIndexDiv = document.createElement('div')
+//     debugIndexDiv.classList.add('board__debug-position')
 
-    const debugIndexText = document.createTextNode(position)
-    debugIndexDiv.appendChild(debugIndexText)
+//     const debugIndexText = document.createTextNode(position)
+//     debugIndexDiv.appendChild(debugIndexText)
 
-    square.appendChild(debugIndexDiv)
-  })
-}
+//     square.appendChild(debugIndexDiv)
+//   })
+// }
 
-renderBoard()
-renderDebugIndices()
+const DEFAULT_POSITION_ARRAY = [
+  Piece.ROOK | Piece.BLACK,
+  Piece.KNIGHT | Piece.BLACK,
+  Piece.BISHOP | Piece.BLACK,
+  Piece.QUEEN | Piece.BLACK,
+  Piece.KING | Piece.BLACK,
+  Piece.BISHOP | Piece.BLACK,
+  Piece.KNIGHT | Piece.BLACK,
+  Piece.ROOK | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.PAWN | Piece.BLACK,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.NONE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.PAWN | Piece.WHITE,
+  Piece.ROOK | Piece.WHITE,
+  Piece.KNIGHT | Piece.WHITE,
+  Piece.BISHOP | Piece.WHITE,
+  Piece.QUEEN | Piece.WHITE,
+  Piece.KING | Piece.WHITE,
+  Piece.BISHOP | Piece.WHITE,
+  Piece.KNIGHT | Piece.WHITE,
+  Piece.ROOK | Piece.WHITE,
+]
+
+renderBoard(DEFAULT_POSITION_ARRAY)
+// renderDebugIndices()

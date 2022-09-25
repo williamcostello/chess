@@ -21,9 +21,11 @@ h1 {
 }
 
 .board__square {
-  background-color: red;
   width: 50px;
   height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .board__square--light {
@@ -34,11 +36,18 @@ h1 {
   background-color: rgb(129, 90, 39);
 }
 
-.board__debug-position {
-  height: 100%;
+/* .board__debug-position {
+  position: absolute;
+  z-index: 2;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  color: rgba(0, 0, 0, 0.2);
+  justify-content: right;
+  align-items: top;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.6);
+} */
+
+.board__piece {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
 }

@@ -37,4 +37,12 @@ const getPieceType = (piece) => piece & PIECE_TYPE_MASK
  */
 const getPieceColour = (piece) => piece & PIECE_COLOUR_MASK
 
-export { Piece, getPieceColour, getPieceType }
+/**
+ * Takes a piece type and returns its name as a string
+ * @param {pieceType} PieceType The type to get the name of
+ * @returns {string} Piece Type
+ */
+const getPieceTypeName = (pieceType) =>
+  Object.keys(Piece).find((key) => Piece[key] === pieceType)
+
+export { Piece, getPieceColour, getPieceType, getPieceTypeName }
