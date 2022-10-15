@@ -5,16 +5,18 @@ import {
   getPieceTypeName,
 } from './piece.js'
 
+/**
+ * Renders the given position to #board
+ * @param {Array} position
+ */
 const renderBoard = (position) => {
   let board = document.createElement('div')
   board.id = 'board'
 
-  // 8 rows
   for (let rank = 0; rank < 8; rank++) {
     const row = document.createElement('div')
     row.className = 'board__row'
 
-    // of 8 squares
     for (let file = 0; file < 8; file++) {
       const squareColour = getSquareColourFromRankAndFile(rank, file)
       const squareIndex = getSquareIndexFromRankAndFile(rank, file)
@@ -36,41 +38,95 @@ const renderBoard = (position) => {
   document.getElementById('board').replaceWith(board)
 }
 
+/**
+ * Renders piece into square
+ * @param {HTMLDivElement} square
+ * @param {Piece} piece
+ */
 const renderPiece = (square, piece) => {
   const svgUrl = getSvgUrlForPiece(piece)
 
   const pieceDiv = document.createElement('div')
   pieceDiv.style.backgroundImage = `url('${svgUrl}')`
   pieceDiv.className = 'board__piece'
+  pieceDiv.draggable = true
+  pieceDiv.addEventListener('click', showMoves)
 
   square.appendChild(pieceDiv)
 }
 
+/**
+ * Returns a className based on the rank and file given
+ * @param {Number} rank
+ * @param {Number} file
+ * @return {className} 'board__square--light' | 'board__square--dark'
+ */
 const getSquareColourFromRankAndFile = (rank, file) => {
   return (rank + file) % 2 == 0 ? 'board__square--light' : 'board__square--dark'
 }
 
+/**
+ * Returns the index of the square at the given rank and file
+ * @param {Number} rank
+ * @param {Number} file
+ * @return {Number} data-square-index
+ */
 const getSquareIndexFromRankAndFile = (rank, file) => rank * 8 + file
 
+/**
+ * Returns the path to the piece's SVG
+ * @param {Piece} piece
+ * @return {String} SVG URL
+ */
 const getSvgUrlForPiece = (piece) => {
   const name = getPieceTypeName(getPieceType(piece))
   const colour = getPieceColour(piece) === Piece.BLACK ? 'BLACK' : 'WHITE'
-  return `../svg/${name}_${colour}.svg`
+  return `svg/${name}_${colour}.svg`
 }
 
-// const renderDebugIndices = () => {
-//   const squares = document.querySelectorAll('.board__square')
+let showingMovesForSquare = null
+const showMoves = (event) => {
+  const squareIndex = event.target.parentElement.dataset.squareIndex
+  const moves = {
+    49: [41, 33],
+    50: [42, 34],
+  }
 
-//   squares.forEach((square, position) => {
-//     const debugIndexDiv = document.createElement('div')
-//     debugIndexDiv.classList.add('board__debug-position')
+  const currentlyShownTargets = [
+    ...document.getElementsByClassName('board__target'),
+  ]
+  currentlyShownTargets.forEach((element) =>
+    element.classList.remove('board__target')
+  )
 
-//     const debugIndexText = document.createTextNode(position)
-//     debugIndexDiv.appendChild(debugIndexText)
+  const alreadyShowingMovesForSquare = squareIndex === showingMovesForSquare
+  if (alreadyShowingMovesForSquare) {
+    showingMovesForSquare = null
+    return
+  }
 
-//     square.appendChild(debugIndexDiv)
-//   })
-// }
+  const targetsToShow = squareIndex in moves ? moves[squareIndex] : []
+  targetsToShow.forEach((targetId) => {
+    const element = document.querySelector(`[data-square-index='${targetId}'`)
+    element.classList.add('board__target')
+  })
+
+  showingMovesForSquare = squareIndex
+}
+
+const renderDebugIndices = () => {
+  const squares = document.querySelectorAll('.board__square')
+
+  squares.forEach((square, position) => {
+    const debugIndexDiv = document.createElement('div')
+    debugIndexDiv.classList.add('board__debug-position')
+
+    const debugIndexText = document.createTextNode(position)
+    debugIndexDiv.appendChild(debugIndexText)
+
+    square.appendChild(debugIndexDiv)
+  })
+}
 
 const DEFAULT_POSITION_ARRAY = [
   Piece.ROOK | Piece.BLACK,
