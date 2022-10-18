@@ -8,8 +8,10 @@ h1 {
   justify-content: center;
 }
 
-#board {
-  display: inline-block;
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  gap: 0;
   border: 5px solid rgb(12, 7, 1);
   border-radius: 10px;
   overflow: hidden;

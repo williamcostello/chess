@@ -12,12 +12,10 @@ import {
 const renderBoard = (position) => {
   let board = document.createElement('div')
   board.id = 'board'
+  board.className = 'board'
   board.dataset.currentMovesIndex = null
 
   for (let rank = 0; rank < 8; rank++) {
-    const row = document.createElement('div')
-    row.className = 'board__row'
-
     for (let file = 0; file < 8; file++) {
       const squareColour = getSquareColourFromRankAndFile(rank, file)
       const squareIndex = getSquareIndexFromRankAndFile(rank, file)
@@ -30,10 +28,8 @@ const renderBoard = (position) => {
         renderPiece(square, position[squareIndex])
       }
 
-      row.appendChild(square)
+      board.appendChild(square)
     }
-
-    board.appendChild(row)
   }
 
   document.getElementById('board').replaceWith(board)
