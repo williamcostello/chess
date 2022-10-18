@@ -3,7 +3,7 @@ import {
   Piece,
   getPieceType,
   getPieceColour,
-  getPieceTypeName,
+  getPieceClassLetter,
 } from '../src/js/piece.js'
 
 describe('Piece', () => {
@@ -56,26 +56,27 @@ describe('Piece', () => {
   })
 
   describe('getPieceName', () => {
-    it('gets correct name from PAWN', () => {
+    it('gets correct letter from PAWN', () => {
       // Setup
       const pieceType = Piece.PAWN
 
       // Execution
-      const name = getPieceTypeName(pieceType)
+      const letter = getPieceClassLetter(pieceType)
 
       // Verify
-      assert.strictEqual(name, 'PAWN', 'Piece name is not PAWN')
+      assert.strictEqual(letter, 'p', 'Class letter is not p')
     })
 
-    it('gets correct name from QUEEN', () => {
+    it('gets correct letter from QUEEN', () => {
       // Setup
       const pieceType = Piece.QUEEN
 
       // Execution
-      const name = getPieceTypeName(pieceType)
+      const letter = getPieceClassLetter(pieceType)
+      console.log(letter)
 
       // Verify
-      assert.strictEqual(name, 'QUEEN', 'Piece name is not QUEEN')
+      assert.strictEqual(letter, 'q', 'Class letter is not q')
     })
   })
 })

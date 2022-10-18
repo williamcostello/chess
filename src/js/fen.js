@@ -39,23 +39,27 @@ export const FILE_MAP = {
  * @return {number[]} positionArray
  */
 export const parsePosition = (position) => {
-  let positionArray = new Array(64)
+  // Initialise 2D array
+  let positionArray = new Array(8).fill(0).map(() => new Array(8))
   let positionIndex = 0
 
-  for (const char of position) {
-    if (char in FEN_MAP) {
-      positionArray[positionIndex] = FEN_MAP[char]
-      positionIndex++
-    } else if (/\d/.test(char)) {
-      const numberOfBlanks = Number(char)
-      const targetIndex = positionIndex + numberOfBlanks
+  Array.from(position).forEach((char) => {
+    const getRank = () => Math.floor(positionIndex / 8)
+    const getFile = () => positionIndex % 8
 
-      while (positionIndex < targetIndex) {
-        positionArray[positionIndex] = Piece.NONE
+    if (char in FEN_MAP) {
+      positionArray[getRank()][getFile()] = FEN_MAP[char]
+      positionIndex++
+    } else if (!isNaN(char)) {
+      const incrementUntil = positionIndex + parseInt(char)
+      while (positionIndex < incrementUntil) {
+        positionArray[getRank()][getFile()] = Piece.NONE
         positionIndex++
       }
     }
-  }
+  })
+
+  console.log(positionArray)
 
   return positionArray
 }

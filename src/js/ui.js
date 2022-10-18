@@ -2,7 +2,7 @@ import {
   Piece,
   getPieceType,
   getPieceColour,
-  getPieceTypeName,
+  getPieceClassLetter,
 } from './piece.js'
 
 /**
@@ -15,22 +15,11 @@ const renderBoard = (position) => {
   board.className = 'board'
   board.dataset.currentMovesIndex = null
 
-  for (let rank = 0; rank < 8; rank++) {
-    for (let file = 0; file < 8; file++) {
-      const squareColour = getSquareColourFromRankAndFile(rank, file)
-      const squareIndex = getSquareIndexFromRankAndFile(rank, file)
-
-      const square = document.createElement('div')
-      square.classList.add('board__square', squareColour)
-      square.dataset.squareIndex = squareIndex
-
-      if (position[squareIndex] != Piece.NONE) {
-        renderPiece(square, position[squareIndex])
-      }
-
-      board.appendChild(square)
-    }
-  }
+  position.forEach((row, rankNo) => {
+    row.forEach((piece, fileNo) => {
+      if (piece !== Piece.NONE) renderPiece(board, piece, rankNo, fileNo)
+    })
+  })
 
   document.getElementById('board').replaceWith(board)
 }
@@ -40,16 +29,16 @@ const renderBoard = (position) => {
  * @param {HTMLDivElement} square
  * @param {Piece} piece
  */
-const renderPiece = (square, piece) => {
-  const svgUrl = getSvgUrlForPiece(piece)
-
+const renderPiece = (board, piece, rank, file) => {
   const pieceDiv = document.createElement('div')
-  pieceDiv.style.backgroundImage = `url('${svgUrl}')`
-  pieceDiv.className = 'board__piece'
+  pieceDiv.classList.add(
+    'piece',
+    getPieceClassName(piece),
+    `r${rank}`,
+    `f${file}`
+  )
   pieceDiv.addEventListener('click', showMoves)
-  pieceDiv.addEventListener('drag', console.log('bosh'))
-
-  square.appendChild(pieceDiv)
+  board.appendChild(pieceDiv)
 }
 
 /**
@@ -75,10 +64,10 @@ const getSquareIndexFromRankAndFile = (rank, file) => rank * 8 + file
  * @param {Piece} piece
  * @return {String} SVG URL
  */
-const getSvgUrlForPiece = (piece) => {
-  const name = getPieceTypeName(getPieceType(piece))
-  const colour = getPieceColour(piece) === Piece.BLACK ? 'BLACK' : 'WHITE'
-  return `svg/${name}_${colour}.svg`
+const getPieceClassName = (piece) => {
+  const colour = getPieceColour(piece) === Piece.WHITE ? 'w' : 'b'
+  const letter = getPieceClassLetter(getPieceType(piece))
+  return `${colour}${letter}`
 }
 
 /**
@@ -134,70 +123,86 @@ const renderDebugIndices = () => {
 }
 
 const DEFAULT_POSITION_ARRAY = [
-  Piece.ROOK | Piece.BLACK,
-  Piece.KNIGHT | Piece.BLACK,
-  Piece.BISHOP | Piece.BLACK,
-  Piece.QUEEN | Piece.BLACK,
-  Piece.KING | Piece.BLACK,
-  Piece.BISHOP | Piece.BLACK,
-  Piece.KNIGHT | Piece.BLACK,
-  Piece.ROOK | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.PAWN | Piece.BLACK,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.NONE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.PAWN | Piece.WHITE,
-  Piece.ROOK | Piece.WHITE,
-  Piece.KNIGHT | Piece.WHITE,
-  Piece.BISHOP | Piece.WHITE,
-  Piece.QUEEN | Piece.WHITE,
-  Piece.KING | Piece.WHITE,
-  Piece.BISHOP | Piece.WHITE,
-  Piece.KNIGHT | Piece.WHITE,
-  Piece.ROOK | Piece.WHITE,
+  [
+    Piece.ROOK | Piece.BLACK,
+    Piece.KNIGHT | Piece.BLACK,
+    Piece.BISHOP | Piece.BLACK,
+    Piece.QUEEN | Piece.BLACK,
+    Piece.KING | Piece.BLACK,
+    Piece.BISHOP | Piece.BLACK,
+    Piece.KNIGHT | Piece.BLACK,
+    Piece.ROOK | Piece.BLACK,
+  ],
+  [
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+  ],
+  [
+    Piece.ROOK | Piece.WHITE,
+    Piece.KNIGHT | Piece.WHITE,
+    Piece.BISHOP | Piece.WHITE,
+    Piece.QUEEN | Piece.WHITE,
+    Piece.KING | Piece.WHITE,
+    Piece.BISHOP | Piece.WHITE,
+    Piece.KNIGHT | Piece.WHITE,
+    Piece.ROOK | Piece.WHITE,
+  ],
 ]
 
 let moves = {

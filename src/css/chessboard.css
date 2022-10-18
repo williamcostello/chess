@@ -1,3 +1,6 @@
+@import './pieces.css';
+@import './positions.css';
+
 h1 {
   text-align: center;
   font-family: "Helvetica Neue",Helvetica,Arial
@@ -9,56 +12,22 @@ h1 {
 }
 
 .board {
-  display: grid;
-  grid-template-columns: repeat(8, 50px);
-  gap: 0;
+  background-image: url('../chessboard.png');
+  background-size: contain;
+  height: min(80vh, 80vw);
+  width: min(80vh, 80vw);
   border: 5px solid rgb(12, 7, 1);
   border-radius: 10px;
   overflow: hidden;
-}
-
-.board__row {
-  display: flex;
-  justify-content: center;
-}
-
-.board__square {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
 }
 
-.board__square--light {
-  background-color:  rgb(222, 184, 135);
-}
-
-.board__square--dark {
-  background-color: rgb(129, 90, 39);
-}
-
-.board__debug-position {
+.piece {
+  height: 12.5%;
+  width: 12.5%;
+  background-size: contain;
   position: absolute;
-  z-index: 2;
-  font-size: 20px;
-  color: rgb(111, 255, 59);
   top: 0;
-  right: 0;
-}
-
-.board__piece {
-  height: 100%;
-  width: 100%;
-  background-size: cover;
-}
-
-.board__target:after {
-  height: 40%;
-  width: 40%;
-  background-color: rgba(0, 0, 0, 0.658);
-  border-radius: 100%;
-  position: absolute;
-  content:"";
+  left: 0;
+  translate: calc(var(--file) * 100%) calc(var(--rank) * 100%);
 }

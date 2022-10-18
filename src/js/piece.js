@@ -24,6 +24,19 @@ const Piece = {
 }
 
 /**
+ * Enum for piece types and colours
+ * A piece is the result of a TYPE and a COLOUR bitwise OR'd
+ */
+const ClassLetters = {
+  p: Piece.PAWN,
+  n: Piece.KNIGHT,
+  b: Piece.BISHOP,
+  r: Piece.ROOK,
+  q: Piece.QUEEN,
+  k: Piece.KING,
+}
+
+/**
  * Takes a piece and returns its type as a number
  * @param {number} piece The piece to get the type of
  * @returns {number} Piece Type
@@ -40,9 +53,9 @@ const getPieceColour = (piece) => piece & PIECE_COLOUR_MASK
 /**
  * Takes a piece type and returns its name as a string
  * @param {pieceType} PieceType The type to get the name of
- * @returns {string} Piece Type
+ * @returns {string} Piece Class Letter
  */
-const getPieceTypeName = (pieceType) =>
-  Object.keys(Piece).find((key) => Piece[key] === pieceType)
+const getPieceClassLetter = (pieceType) =>
+  Object.keys(ClassLetters).find((key) => ClassLetters[key] === pieceType)
 
-export { Piece, getPieceColour, getPieceType, getPieceTypeName }
+export { Piece, getPieceColour, getPieceType, getPieceClassLetter }
