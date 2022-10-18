@@ -12,6 +12,7 @@ import {
 const renderBoard = (position) => {
   let board = document.createElement('div')
   board.id = 'board'
+  board.dataset.currentMovesIndex = null
 
   for (let rank = 0; rank < 8; rank++) {
     const row = document.createElement('div')
@@ -49,8 +50,8 @@ const renderPiece = (square, piece) => {
   const pieceDiv = document.createElement('div')
   pieceDiv.style.backgroundImage = `url('${svgUrl}')`
   pieceDiv.className = 'board__piece'
-  pieceDiv.draggable = true
   pieceDiv.addEventListener('click', showMoves)
+  pieceDiv.addEventListener('drag', console.log('bosh'))
 
   square.appendChild(pieceDiv)
 }
@@ -84,24 +85,20 @@ const getSvgUrlForPiece = (piece) => {
   return `svg/${name}_${colour}.svg`
 }
 
-let showingMovesForSquare = null
+/**
+ * Event Listener Function to show the moves available to the clicked piece
+ * @param {MouseEvent} event
+ */
 const showMoves = (event) => {
+  const board = document.getElementById('board')
   const squareIndex = event.target.parentElement.dataset.squareIndex
-  const moves = {
-    49: [41, 33],
-    50: [42, 34],
-  }
+  const currentMovesIndex = board.dataset['currentMovesIndex']
 
-  const currentlyShownTargets = [
-    ...document.getElementsByClassName('board__target'),
-  ]
-  currentlyShownTargets.forEach((element) =>
-    element.classList.remove('board__target')
-  )
+  hideMoves()
 
-  const alreadyShowingMovesForSquare = squareIndex === showingMovesForSquare
-  if (alreadyShowingMovesForSquare) {
-    showingMovesForSquare = null
+  const isAlreadyShowingMovesForIndex = currentMovesIndex === squareIndex
+  if (isAlreadyShowingMovesForIndex) {
+    board.dataset['currentMovesIndex'] = null
     return
   }
 
@@ -111,7 +108,19 @@ const showMoves = (event) => {
     element.classList.add('board__target')
   })
 
-  showingMovesForSquare = squareIndex
+  board.dataset['currentMovesIndex'] = squareIndex
+}
+
+/**
+ * Removes the target class from all squares
+ */
+const hideMoves = () => {
+  const currentlyShownTargets = [
+    ...document.getElementsByClassName('board__target'),
+  ]
+  currentlyShownTargets.forEach((element) =>
+    element.classList.remove('board__target')
+  )
 }
 
 const renderDebugIndices = () => {
@@ -195,5 +204,11 @@ const DEFAULT_POSITION_ARRAY = [
   Piece.ROOK | Piece.WHITE,
 ]
 
+let moves = {
+  48: [40, 32],
+  49: [41, 33],
+}
+
 renderBoard(DEFAULT_POSITION_ARRAY)
+
 // renderDebugIndices()
