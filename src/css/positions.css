@@ -1,63 +1,131 @@
-.board .r0 {
-  --rank: 0
+/* NORMAL RANKS */
+.board > .r1 {
+  --yShift: 7
 }
 
-.board .r1 {
-  --rank: 1
+.board > .r2 {
+  --yShift: 6
 }
 
-.board .r2 {
-  --rank: 2
+.board > .r3 {
+  --yShift: 5
 }
 
-.board .r3 {
-  --rank: 3
+.board > .r4 {
+  --yShift: 4
 }
 
-.board .r4 {
-  --rank: 4
+.board > .r5 {
+  --yShift: 3
 }
 
-.board .r5 {
-  --rank: 5
+.board > .r6 {
+  --yShift: 2
 }
 
-.board .r6 {
-  --rank: 6
+.board > .r7 {
+  --yShift: 1
 }
 
-.board .r7 {
-  --rank: 7
+.board > .r8 {
+  --yShift: 0
 }
 
-.board .f0 {
-  --file: 0
+/* NORMAL FILES */
+.board > .f1 {
+  --xShift: 0
 }
 
-.board .f1 {
-  --file: 1
+.board > .f2 {
+  --xShift: 1
 }
 
-.board .f2 {
-  --file: 2
+.board > .f3 {
+  --xShift: 2
 }
 
-.board .f3 {
-  --file: 3
+.board > .f4 {
+  --xShift: 3
 }
 
-.board .f4 {
-  --file: 4
+.board > .f5 {
+  --xShift: 4
 }
 
-.board .f5 {
-  --file: 5
+.board > .f6 {
+  --xShift: 5
 }
 
-.board .f6 {
-  --file: 6
+.board > .f7 {
+  --xShift: 6
 }
 
-.board .f7 {
-  --file: 7
+.board > .f8 {
+  --xShift: 7
+}
+
+/* Flipped Ranks */
+.board.flipped > .r1 {
+  --yShift: 0
+}
+
+.board.flipped > .r2 {
+  --yShift: 1
+}
+
+.board.flipped > .r3 {
+  --yShift: 2
+}
+
+.board.flipped > .r4 {
+  --yShift: 3
+}
+
+.board.flipped > .r5 {
+  --yShift: 4
+}
+
+.board.flipped > .r6 {
+  --yShift: 5
+}
+
+.board.flipped > .r7 {
+  --yShift: 6
+}
+
+.board.flipped > .r8 {
+  --yShift: 7
+}
+
+/* FLIPPED FILES */
+.board.flipped > .f1 {
+  --xShift: 7
+}
+
+.board.flipped > .f2 {
+  --xShift: 6
+}
+
+.board.flipped > .f3 {
+  --xShift: 5
+}
+
+.board.flipped > .f4 {
+  --xShift: 4
+}
+
+.board.flipped > .f5 {
+  --xShift: 3
+}
+
+.board.flipped > .f6 {
+  --xShift: 2
+}
+
+.board.flipped > .f7 {
+  --xShift: 1
+}
+
+.board.flipped > .f8 {
+  --xShift: 0
 }

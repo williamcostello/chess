@@ -5,6 +5,13 @@ import {
   getPieceClassLetter,
 } from './piece.js'
 
+// Stores UI flags
+const UI = {
+  currentMovesKey: null,
+  boardIsFlipped: false,
+  draggedPiece: null,
+}
+
 /**
  * Renders the given position to #board
  * @param {Array} position
@@ -13,7 +20,10 @@ const renderBoard = (position) => {
   let board = document.createElement('div')
   board.id = 'board'
   board.className = 'board'
-  board.dataset.currentMovesIndex = null
+  board.dataset.currentMovesKey = null
+  board.addEventListener('pointerdown', handleBoardPointerDown)
+  board.addEventListener('pointerup', handleBoardPointerUp)
+  board.addEventListener('pointermove', handleBoardPointerMove)
 
   position.forEach((row, rankNo) => {
     row.forEach((piece, fileNo) => {
@@ -34,30 +44,83 @@ const renderPiece = (board, piece, rank, file) => {
   pieceDiv.classList.add(
     'piece',
     getPieceClassName(piece),
-    `r${rank}`,
-    `f${file}`
+    `r${rank + 1}`,
+    `f${file + 1}`
   )
-  pieceDiv.addEventListener('click', showMoves)
+  pieceDiv.addEventListener('pointerdown', handlePiecePointerDown)
   board.appendChild(pieceDiv)
 }
 
 /**
- * Returns a className based on the rank and file given
- * @param {Number} rank
- * @param {Number} file
- * @return {className} 'board__square--light' | 'board__square--dark'
+ * Pointer down event listener for the Board element
  */
-const getSquareColourFromRankAndFile = (rank, file) => {
-  return (rank + file) % 2 == 0 ? 'board__square--light' : 'board__square--dark'
+const handleBoardPointerDown = () => {
+  console.log('boardPointerDown')
+  removeTargets()
+}
+
+const handleBoardPointerMove = (event) => {
+  if (UI.draggedPiece) dragPiece(event)
 }
 
 /**
- * Returns the index of the square at the given rank and file
- * @param {Number} rank
- * @param {Number} file
- * @return {Number} data-square-index
+ * Pointer down event listener for Piece elements
+ * @param {Event} event
  */
-const getSquareIndexFromRankAndFile = (rank, file) => rank * 8 + file
+const handlePiecePointerDown = (event) => {
+  showTargets(event)
+  beginDragPiece(event)
+  event.stopPropagation()
+}
+
+/**
+ * Drag event listener to cancel default drag
+ */
+const handlePieceDrag = () => {
+  return false
+}
+
+/**
+ * Listener function to initialise piece dragging
+ * @param {Event} event
+ */
+const beginDragPiece = (event) => {
+  UI.draggedPiece = event.target
+  dragPiece(event)
+}
+
+const dragPiece = (event) => {
+  // move UI.draggedPiece to the mouse pos relative to board
+  const pieceRect = event.target.getBoundingClientRect()
+  const halfPieceHeight = pieceRect.height / 2
+  const halfPieceWidth = pieceRect.width / 2
+
+  const boardRect = document.getElementById('board').getBoundingClientRect()
+  const yShift =
+    ((event.clientY - boardRect.top - halfPieceHeight) / boardRect.height) * 8
+  const xShift =
+    ((event.clientX - boardRect.left - halfPieceWidth) / boardRect.width) * 8
+
+  UI.draggedPiece.style.setProperty('--xShift', xShift)
+  UI.draggedPiece.style.setProperty('--yShift', yShift)
+}
+
+/**
+ * Listener function to initialise piece dragging
+ * @param {Event} event
+ */
+const stopDragPiece = (event) => {
+  UI.draggedPiece = null
+  console.log('Drop piece')
+}
+
+/**
+ * Board listener function to handle pointer up
+ */
+const handleBoardPointerUp = (event) => {
+  console.log('boardPointerUp')
+  stopDragPiece(event)
+}
 
 /**
  * Returns the path to the piece's SVG
@@ -74,125 +137,61 @@ const getPieceClassName = (piece) => {
  * Event Listener Function to show the moves available to the clicked piece
  * @param {MouseEvent} event
  */
-const showMoves = (event) => {
-  const board = document.getElementById('board')
-  const squareIndex = event.target.parentElement.dataset.squareIndex
-  const currentMovesIndex = board.dataset['currentMovesIndex']
+const showTargets = (event) => {
+  const thisMovesKey = getMovesKeyForTarget(event)
+  const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
 
-  hideMoves()
+  removeTargets()
 
-  const isAlreadyShowingMovesForIndex = currentMovesIndex === squareIndex
-  if (isAlreadyShowingMovesForIndex) {
-    board.dataset['currentMovesIndex'] = null
+  if (isAlreadyShowingMovesForKey || !moves.has(thisMovesKey)) {
+    UI.currentMovesKey = null
     return
   }
 
-  const targetsToShow = squareIndex in moves ? moves[squareIndex] : []
-  targetsToShow.forEach((targetId) => {
-    const element = document.querySelector(`[data-square-index='${targetId}'`)
-    element.classList.add('board__target')
+  const targetsToShow = moves.get(thisMovesKey)
+  targetsToShow.forEach(([targetRank, targetFile]) => {
+    const target = document.createElement('div')
+    target.classList.add(
+      'target',
+      'move',
+      `r${targetRank + 1}`,
+      `f${targetFile + 1}`
+    )
+    document.getElementById('board').appendChild(target)
   })
 
-  board.dataset['currentMovesIndex'] = squareIndex
+  UI.currentMovesKey = thisMovesKey
 }
 
 /**
  * Removes the target class from all squares
  */
-const hideMoves = () => {
-  const currentlyShownTargets = [
-    ...document.getElementsByClassName('board__target'),
-  ]
-  currentlyShownTargets.forEach((element) =>
-    element.classList.remove('board__target')
-  )
+const removeTargets = () => {
+  let targets = document.getElementsByClassName('target')
+  Array.from(targets).forEach((element) => element.remove())
 }
 
-const renderDebugIndices = () => {
-  const squares = document.querySelectorAll('.board__square')
+/**
+ * @param {Event} event
+ * @return {Number[]} [rank,file] Moves Key
+ */
+const getMovesKeyForTarget = (event) => {
+  const rect = document.getElementById('board').getBoundingClientRect()
+  const rank = 7 - Math.floor(((event.clientY - rect.top) / rect.height) * 8)
+  const file = Math.floor(((event.clientX - rect.left) / rect.width) * 8)
+  return `${rank},${file}`
+}
 
-  squares.forEach((square, position) => {
-    const debugIndexDiv = document.createElement('div')
-    debugIndexDiv.classList.add('board__debug-position')
-
-    const debugIndexText = document.createTextNode(position)
-    debugIndexDiv.appendChild(debugIndexText)
-
-    square.appendChild(debugIndexDiv)
-  })
+/**
+ * Toggles board 'flipped' class
+ */
+const flipBoard = () => {
+  if (UI.boardIsFlipped) board.classList.remove('flipped')
+  else board.classList.add('flipped')
+  UI.boardIsFlipped = !UI.boardIsFlipped
 }
 
 const DEFAULT_POSITION_ARRAY = [
-  [
-    Piece.ROOK | Piece.BLACK,
-    Piece.KNIGHT | Piece.BLACK,
-    Piece.BISHOP | Piece.BLACK,
-    Piece.QUEEN | Piece.BLACK,
-    Piece.KING | Piece.BLACK,
-    Piece.BISHOP | Piece.BLACK,
-    Piece.KNIGHT | Piece.BLACK,
-    Piece.ROOK | Piece.BLACK,
-  ],
-  [
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-  ],
   [
     Piece.ROOK | Piece.WHITE,
     Piece.KNIGHT | Piece.WHITE,
@@ -203,13 +202,84 @@ const DEFAULT_POSITION_ARRAY = [
     Piece.KNIGHT | Piece.WHITE,
     Piece.ROOK | Piece.WHITE,
   ],
+  [
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+    Piece.PAWN | Piece.WHITE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+    Piece.NONE,
+  ],
+  [
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+    Piece.PAWN | Piece.BLACK,
+  ],
+  [
+    Piece.ROOK | Piece.BLACK,
+    Piece.KNIGHT | Piece.BLACK,
+    Piece.BISHOP | Piece.BLACK,
+    Piece.QUEEN | Piece.BLACK,
+    Piece.KING | Piece.BLACK,
+    Piece.BISHOP | Piece.BLACK,
+    Piece.KNIGHT | Piece.BLACK,
+    Piece.ROOK | Piece.BLACK,
+  ],
 ]
 
-let moves = {
-  48: [40, 32],
-  49: [41, 33],
-}
+let moves = new Map()
+moves.set('1,0', [
+  [2, 0],
+  [3, 0],
+])
 
 renderBoard(DEFAULT_POSITION_ARRAY)
-
+document.getElementById('flip-button').addEventListener('click', flipBoard)
 // renderDebugIndices()

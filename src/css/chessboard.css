@@ -1,14 +1,30 @@
 @import './pieces.css';
 @import './positions.css';
 
+:root {
+  --theme-square-light: hsl(37, 66%, 83%);
+  --theme-square-dark: hsl(27, 36%, 55%);
+  --theme-target-colour: hsl(0, 0%, 0%, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 h1 {
   text-align: center;
-  font-family: "Helvetica Neue",Helvetica,Arial
+  font-family: "Helvetica Neue",Helvetica,Arial;
+  color: white;
 }
 
 #game-area {
+  height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .board {
@@ -16,18 +32,37 @@ h1 {
   background-size: contain;
   height: min(80vh, 80vw);
   width: min(80vh, 80vw);
-  border: 5px solid rgb(12, 7, 1);
-  border-radius: 10px;
+  outline: 5px solid black;
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
 }
 
-.piece {
+.piece, .target {
   height: 12.5%;
   width: 12.5%;
   background-size: contain;
   position: absolute;
   top: 0;
   left: 0;
-  translate: calc(var(--file) * 100%) calc(var(--rank) * 100%);
+  translate: calc(var(--xShift) * 100%) calc(var(--yShift) * 100%);
+}
+
+.target {
+  background-clip: content-box;
+  border-radius: 50%;
+}
+
+.target.move {
+  background-color: var(--theme-target-colour);
+  padding: 4.2%;
+}
+
+.target.capture {
+  border: 5px solid var(--theme-target-colour);
+}
+
+button {
+  padding: 10px;
+  margin: 15px;
 }
