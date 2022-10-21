@@ -5,11 +5,17 @@ import {
   getPieceClassLetter,
 } from './piece.js'
 
-// Stores UI flags
+const DragState = {
+  NONE: 0,
+  DRAGGING_TO_SHOW: 1,
+  DRAGGING_TO_HIDE: 2,
+}
+
 const UI = {
   currentMovesKey: null,
   boardIsFlipped: false,
   draggedPiece: null,
+  dragState: DragState.NONE,
 }
 
 /**
@@ -55,8 +61,9 @@ const renderPiece = (board, piece, rank, file) => {
  * Pointer down event listener for the Board element
  */
 const handleBoardPointerDown = () => {
-  console.log('boardPointerDown')
+  console.info('boardPointerDown')
   removeTargets()
+  UI.dragState = DragState.NONE
 }
 
 const handleBoardPointerMove = (event) => {
@@ -64,20 +71,50 @@ const handleBoardPointerMove = (event) => {
 }
 
 /**
+ * Board listener function to handle pointer up
+ */
+const handleBoardPointerUp = (event) => {
+  console.info('boardPointerUp')
+  if (UI.draggedPiece) stopDragPiece(event)
+
+  // TODO: CLEAN THIS MESS UP
+  if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
+    UI.dragState = DragState.DRAGGING_TO_HIDE
+  } else if (UI.dragState === DragState.DRAGGING_TO_HIDE) {
+    removeTargets()
+    UI.dragState = DragState.NONE
+  }
+  console.log(UI.dragState)
+}
+
+/**
  * Pointer down event listener for Piece elements
  * @param {Event} event
  */
 const handlePiecePointerDown = (event) => {
-  showTargets(event)
+  const [rank, file] = getRankAndFileTuple(event)
+  const thisMovesKey = `${rank},${file}`
+  const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
+
+  console.info('piecePointerDown')
+  // TODO: CLEAN THIS MESS UP
+  if (UI.dragState === DragState.NONE) {
+    UI.dragState = DragState.DRAGGING_TO_SHOW
+    showTargets(thisMovesKey)
+  } else if (
+    UI.dragState === DragState.DRAGGING_TO_HIDE &&
+    !isAlreadyShowingMovesForKey
+  ) {
+    UI.dragState = DragState.DRAGGING_TO_SHOW
+    removeTargets()
+    showTargets(thisMovesKey)
+  } else if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
+    UI.dragState = DragState.DRAGGING_TO_HIDE
+  }
+  console.log(UI.dragState)
+
   beginDragPiece(event)
   event.stopPropagation()
-}
-
-/**
- * Drag event listener to cancel default drag
- */
-const handlePieceDrag = () => {
-  return false
 }
 
 /**
@@ -86,6 +123,7 @@ const handlePieceDrag = () => {
  */
 const beginDragPiece = (event) => {
   UI.draggedPiece = event.target
+  UI.draggedPiece.classList.add('dragging')
   dragPiece(event)
 }
 
@@ -111,28 +149,26 @@ const dragPiece = (event) => {
  */
 const stopDragPiece = (event) => {
   // copy code that gets the picked up piece
-  const [rank, file] = getRankAndFileTuple(event)
+  const attemptedMove = getRankAndFileTuple(event)
+  const thisPieceMoves = moves.get(UI.currentMovesKey)
+  console.info({ currentMovesKey: UI.currentMovesKey })
+  console.log({ attemptedMove, thisPieceMoves })
+
+  // if (thisPieceMoves && thisPieceMoves.some()) {
+  //   let currentClassName = UI.draggedPiece.className
+  //   const newClassName = currentClassName
+  //     .replace(/r\d/, `r${rank}`)
+  //     .replace(/f\d/, `f${file}`)
+  //   UI.draggedPiece.className = newClassName
+  // }
+
   UI.draggedPiece.style.removeProperty('--yShift')
   UI.draggedPiece.style.removeProperty('--xShift')
+  UI.draggedPiece.classList.remove('dragging')
 
   // remove previous r/f classes
-  let currentClassName = UI.draggedPiece.className
-  const newClassName = currentClassName
-    .replace(/r\d/, `r${rank}`)
-    .replace(/f\d/, `f${file}`)
-  UI.draggedPiece.className = newClassName
 
-  console.log({ rank, file })
-  console.log('Drop piece')
   UI.draggedPiece = null
-}
-
-/**
- * Board listener function to handle pointer up
- */
-const handleBoardPointerUp = (event) => {
-  console.log('boardPointerUp')
-  stopDragPiece(event)
 }
 
 /**
@@ -150,14 +186,8 @@ const getPieceClassName = (piece) => {
  * Event Listener Function to show the moves available to the clicked piece
  * @param {MouseEvent} event
  */
-const showTargets = (event) => {
-  const [rank, file] = getRankAndFileTuple(event)
-  const thisMovesKey = `${rank},${file}`
-  const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
-
-  removeTargets()
-
-  if (isAlreadyShowingMovesForKey || !moves.has(thisMovesKey)) {
+const showTargets = (thisMovesKey) => {
+  if (!moves.has(thisMovesKey)) {
     UI.currentMovesKey = null
     return
   }
@@ -165,12 +195,7 @@ const showTargets = (event) => {
   const targetsToShow = moves.get(thisMovesKey)
   targetsToShow.forEach(([targetRank, targetFile]) => {
     const target = document.createElement('div')
-    target.classList.add(
-      'target',
-      'move',
-      `r${targetRank + 1}`,
-      `f${targetFile + 1}`
-    )
+    target.classList.add('target', 'move', `r${targetRank}`, `f${targetFile}`)
     document.getElementById('board').appendChild(target)
   })
 
@@ -294,7 +319,12 @@ moves.set('1,0', [
   [2, 0],
   [3, 0],
 ])
+moves.set('1,1', [
+  [2, 1],
+  [3, 1],
+])
 
 renderBoard(DEFAULT_POSITION_ARRAY)
 document.getElementById('flip-button').addEventListener('click', flipBoard)
+
 // renderDebugIndices()
