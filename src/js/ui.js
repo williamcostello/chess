@@ -44,8 +44,8 @@ const renderPiece = (board, piece, rank, file) => {
   pieceDiv.classList.add(
     'piece',
     getPieceClassName(piece),
-    `r${rank + 1}`,
-    `f${file + 1}`
+    `r${rank}`,
+    `f${file}`
   )
   pieceDiv.addEventListener('pointerdown', handlePiecePointerDown)
   board.appendChild(pieceDiv)
@@ -110,8 +110,21 @@ const dragPiece = (event) => {
  * @param {Event} event
  */
 const stopDragPiece = (event) => {
-  UI.draggedPiece = null
+  // copy code that gets the picked up piece
+  const [rank, file] = getRankAndFileTuple(event)
+  UI.draggedPiece.style.removeProperty('--yShift')
+  UI.draggedPiece.style.removeProperty('--xShift')
+
+  // remove previous r/f classes
+  let currentClassName = UI.draggedPiece.className
+  const newClassName = currentClassName
+    .replace(/r\d/, `r${rank}`)
+    .replace(/f\d/, `f${file}`)
+  UI.draggedPiece.className = newClassName
+
+  console.log({ rank, file })
   console.log('Drop piece')
+  UI.draggedPiece = null
 }
 
 /**
@@ -138,7 +151,8 @@ const getPieceClassName = (piece) => {
  * @param {MouseEvent} event
  */
 const showTargets = (event) => {
-  const thisMovesKey = getMovesKeyForTarget(event)
+  const [rank, file] = getRankAndFileTuple(event)
+  const thisMovesKey = `${rank},${file}`
   const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
 
   removeTargets()
@@ -175,17 +189,18 @@ const removeTargets = () => {
  * @param {Event} event
  * @return {Number[]} [rank,file] Moves Key
  */
-const getMovesKeyForTarget = (event) => {
+const getRankAndFileTuple = (event) => {
   const rect = document.getElementById('board').getBoundingClientRect()
   const rank = 7 - Math.floor(((event.clientY - rect.top) / rect.height) * 8)
   const file = Math.floor(((event.clientX - rect.left) / rect.width) * 8)
-  return `${rank},${file}`
+  return [rank, file]
 }
 
 /**
  * Toggles board 'flipped' class
  */
 const flipBoard = () => {
+  board.classList
   if (UI.boardIsFlipped) board.classList.remove('flipped')
   else board.classList.add('flipped')
   UI.boardIsFlipped = !UI.boardIsFlipped

@@ -1,131 +1,131 @@
 /* NORMAL RANKS */
-.board > .r1 {
+.board > .r0 {
   --yShift: 7
 }
 
-.board > .r2 {
+.board > .r1 {
   --yShift: 6
 }
 
-.board > .r3 {
+.board > .r2 {
   --yShift: 5
 }
 
-.board > .r4 {
+.board > .r3 {
   --yShift: 4
 }
 
-.board > .r5 {
+.board > .r4 {
   --yShift: 3
 }
 
-.board > .r6 {
+.board > .r5 {
   --yShift: 2
 }
 
-.board > .r7 {
+.board > .r6 {
   --yShift: 1
 }
 
-.board > .r8 {
+.board > .r7 {
   --yShift: 0
 }
 
 /* NORMAL FILES */
-.board > .f1 {
+.board > .f0 {
   --xShift: 0
 }
 
-.board > .f2 {
+.board > .f1 {
   --xShift: 1
 }
 
-.board > .f3 {
+.board > .f2 {
   --xShift: 2
 }
 
-.board > .f4 {
+.board > .f3 {
   --xShift: 3
 }
 
-.board > .f5 {
+.board > .f4 {
   --xShift: 4
 }
 
-.board > .f6 {
+.board > .f5 {
   --xShift: 5
 }
 
-.board > .f7 {
+.board > .f6 {
   --xShift: 6
 }
 
-.board > .f8 {
+.board > .f7 {
   --xShift: 7
 }
 
 /* Flipped Ranks */
-.board.flipped > .r1 {
+.board.flipped > .r0 {
   --yShift: 0
 }
 
-.board.flipped > .r2 {
+.board.flipped > .r1 {
   --yShift: 1
 }
 
-.board.flipped > .r3 {
+.board.flipped > .r2 {
   --yShift: 2
 }
 
-.board.flipped > .r4 {
+.board.flipped > .r3 {
   --yShift: 3
 }
 
-.board.flipped > .r5 {
+.board.flipped > .r4 {
   --yShift: 4
 }
 
-.board.flipped > .r6 {
+.board.flipped > .r5 {
   --yShift: 5
 }
 
-.board.flipped > .r7 {
+.board.flipped > .r6 {
   --yShift: 6
 }
 
-.board.flipped > .r8 {
+.board.flipped > .r7 {
   --yShift: 7
 }
 
 /* FLIPPED FILES */
-.board.flipped > .f1 {
+.board.flipped > .f0 {
   --xShift: 7
 }
 
-.board.flipped > .f2 {
+.board.flipped > .f1 {
   --xShift: 6
 }
 
-.board.flipped > .f3 {
+.board.flipped > .f2 {
   --xShift: 5
 }
 
-.board.flipped > .f4 {
+.board.flipped > .f3 {
   --xShift: 4
 }
 
-.board.flipped > .f5 {
+.board.flipped > .f4 {
   --xShift: 3
 }
 
-.board.flipped > .f6 {
+.board.flipped > .f5 {
   --xShift: 2
 }
 
-.board.flipped > .f7 {
+.board.flipped > .f6 {
   --xShift: 1
 }
 
-.board.flipped > .f8 {
+.board.flipped > .f7 {
   --xShift: 0
 }
