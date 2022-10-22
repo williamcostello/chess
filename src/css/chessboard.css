@@ -48,6 +48,10 @@ h1 {
   translate: calc(var(--xShift) * 100%) calc(var(--yShift) * 100%);
 }
 
+.piece {
+  transition: translate 0.1s linear;
+}
+
 .piece.dragging {
   z-index: 1;
 }

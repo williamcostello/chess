@@ -5,6 +5,8 @@ import {
   getPieceClassLetter,
 } from './piece.js'
 
+import { moves } from './app.js'
+
 const DragState = {
   NONE: 0,
   DRAGGING_TO_SHOW: 1,
@@ -76,15 +78,7 @@ const handleBoardPointerMove = (event) => {
 const handleBoardPointerUp = (event) => {
   console.info('boardPointerUp')
   if (UI.draggedPiece) stopDragPiece(event)
-
-  // TODO: CLEAN THIS MESS UP
-  if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
-    UI.dragState = DragState.DRAGGING_TO_HIDE
-  } else if (UI.dragState === DragState.DRAGGING_TO_HIDE) {
-    removeTargets()
-    UI.dragState = DragState.NONE
-  }
-  console.log(UI.dragState)
+  pointerUpTargetLogic()
 }
 
 /**
@@ -92,27 +86,8 @@ const handleBoardPointerUp = (event) => {
  * @param {Event} event
  */
 const handlePiecePointerDown = (event) => {
-  const [rank, file] = getRankAndFileTuple(event)
-  const thisMovesKey = `${rank},${file}`
-  const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
-
   console.info('piecePointerDown')
-  // TODO: CLEAN THIS MESS UP
-  if (UI.dragState === DragState.NONE) {
-    UI.dragState = DragState.DRAGGING_TO_SHOW
-    showTargets(thisMovesKey)
-  } else if (
-    UI.dragState === DragState.DRAGGING_TO_HIDE &&
-    !isAlreadyShowingMovesForKey
-  ) {
-    UI.dragState = DragState.DRAGGING_TO_SHOW
-    removeTargets()
-    showTargets(thisMovesKey)
-  } else if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
-    UI.dragState = DragState.DRAGGING_TO_HIDE
-  }
-  console.log(UI.dragState)
-
+  pointerDownTargetLogic(event)
   beginDragPiece(event)
   event.stopPropagation()
 }
@@ -149,25 +124,22 @@ const dragPiece = (event) => {
  */
 const stopDragPiece = (event) => {
   // copy code that gets the picked up piece
-  const attemptedMove = getRankAndFileTuple(event)
-  const thisPieceMoves = moves.get(UI.currentMovesKey)
+  const [rank, file] = getRankAndFileTuple(event)
+  const attemptedMove = `${rank},${file}`
+  const availableMoves = getPieceMoves(moves, UI.currentMovesKey)
   console.info({ currentMovesKey: UI.currentMovesKey })
-  console.log({ attemptedMove, thisPieceMoves })
+  console.log({ attemptedMove, thisPieceMoves: availableMoves })
 
-  // if (thisPieceMoves && thisPieceMoves.some()) {
-  //   let currentClassName = UI.draggedPiece.className
-  //   const newClassName = currentClassName
-  //     .replace(/r\d/, `r${rank}`)
-  //     .replace(/f\d/, `f${file}`)
-  //   UI.draggedPiece.className = newClassName
-  // }
+  if (availableMoves && availableMoves.includes(attemptedMove)) {
+    let className = UI.draggedPiece.className
+    className = className.replace(/r\d/, `r${rank}`)
+    className = className.replace(/f\d/, `f${file}`)
+    UI.draggedPiece.className = className
+    removeTargets()
+  }
 
-  UI.draggedPiece.style.removeProperty('--yShift')
-  UI.draggedPiece.style.removeProperty('--xShift')
+  UI.draggedPiece.removeAttribute('style')
   UI.draggedPiece.classList.remove('dragging')
-
-  // remove previous r/f classes
-
   UI.draggedPiece = null
 }
 
@@ -210,6 +182,35 @@ const removeTargets = () => {
   Array.from(targets).forEach((element) => element.remove())
 }
 
+const pointerUpTargetLogic = () => {
+  if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
+    UI.dragState = DragState.DRAGGING_TO_HIDE
+  } else if (UI.dragState === DragState.DRAGGING_TO_HIDE) {
+    removeTargets()
+    UI.dragState = DragState.NONE
+  }
+}
+
+const pointerDownTargetLogic = (event) => {
+  const [rank, file] = getRankAndFileTuple(event)
+  const thisMovesKey = `${rank},${file}`
+  const isAlreadyShowingMovesForKey = thisMovesKey === UI.currentMovesKey
+
+  if (UI.dragState === DragState.NONE) {
+    UI.dragState = DragState.DRAGGING_TO_SHOW
+    showTargets(thisMovesKey)
+  } else if (
+    UI.dragState === DragState.DRAGGING_TO_HIDE &&
+    !isAlreadyShowingMovesForKey
+  ) {
+    UI.dragState = DragState.DRAGGING_TO_SHOW
+    removeTargets()
+    showTargets(thisMovesKey)
+  } else if (UI.dragState === DragState.DRAGGING_TO_SHOW) {
+    UI.dragState = DragState.DRAGGING_TO_HIDE
+  }
+}
+
 /**
  * @param {Event} event
  * @return {Number[]} [rank,file] Moves Key
@@ -231,100 +232,24 @@ const flipBoard = () => {
   UI.boardIsFlipped = !UI.boardIsFlipped
 }
 
-const DEFAULT_POSITION_ARRAY = [
-  [
-    Piece.ROOK | Piece.WHITE,
-    Piece.KNIGHT | Piece.WHITE,
-    Piece.BISHOP | Piece.WHITE,
-    Piece.QUEEN | Piece.WHITE,
-    Piece.KING | Piece.WHITE,
-    Piece.BISHOP | Piece.WHITE,
-    Piece.KNIGHT | Piece.WHITE,
-    Piece.ROOK | Piece.WHITE,
-  ],
-  [
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-    Piece.PAWN | Piece.WHITE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-    Piece.NONE,
-  ],
-  [
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-    Piece.PAWN | Piece.BLACK,
-  ],
-  [
-    Piece.ROOK | Piece.BLACK,
-    Piece.KNIGHT | Piece.BLACK,
-    Piece.BISHOP | Piece.BLACK,
-    Piece.QUEEN | Piece.BLACK,
-    Piece.KING | Piece.BLACK,
-    Piece.BISHOP | Piece.BLACK,
-    Piece.KNIGHT | Piece.BLACK,
-    Piece.ROOK | Piece.BLACK,
-  ],
-]
+/**
+ * Takes an engine moveset of arrays as targets, gives a UI moveset of strings as targets
+ */
+const getUiMoveset = (moveset) => {
+  const uiMoveset = new Map()
+  moveset.forEach((movesForSquare, from) => {
+    const availableTargets = []
+    movesForSquare.forEach((to) => {
+      availableTargets.push(to.join(','))
+    })
+    uiMoveset.set(from, availableTargets)
+  })
+  return uiMoveset
+}
 
-let moves = new Map()
-moves.set('1,0', [
-  [2, 0],
-  [3, 0],
-])
-moves.set('1,1', [
-  [2, 1],
-  [3, 1],
-])
+const getPieceMoves = (moveset, movesKey) => {
+  const uiMoveset = getUiMoveset(moveset)
+  return uiMoveset.get(movesKey)
+}
 
-renderBoard(DEFAULT_POSITION_ARRAY)
-document.getElementById('flip-button').addEventListener('click', flipBoard)
-
-// renderDebugIndices()
+export { getUiMoveset, renderBoard, flipBoard }
