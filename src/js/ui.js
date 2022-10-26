@@ -123,12 +123,9 @@ const dragPiece = (event) => {
  * @param {Event} event
  */
 const stopDragPiece = (event) => {
-  // copy code that gets the picked up piece
   const [rank, file] = getRankAndFileTuple(event)
   const attemptedMove = `${rank},${file}`
   const availableMoves = getPieceMoves(moves, UI.currentMovesKey)
-  console.info({ currentMovesKey: UI.currentMovesKey })
-  console.log({ attemptedMove, thisPieceMoves: availableMoves })
 
   if (availableMoves && availableMoves.includes(attemptedMove)) {
     let className = UI.draggedPiece.className

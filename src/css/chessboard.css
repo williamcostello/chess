@@ -48,7 +48,7 @@ h1 {
   translate: calc(var(--xShift) * 100%) calc(var(--yShift) * 100%);
 }
 
-.piece {
+.piece:not(.dragging) {
   transition: translate 0.1s linear;
 }
 
